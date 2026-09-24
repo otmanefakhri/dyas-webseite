@@ -1,0 +1,36 @@
+DYAS – Webseite online stellen
+================================
+
+INHALT DES ORDNERS
+  index.html        Startseite
+  impressum.html    Impressum (Vorlage – bitte ausfüllen)
+  datenschutz.html  Datenschutzerklärung (Vorlage – Text per Generator erstellen)
+  style.css         Gestaltung (Farben ganz oben unter :root änderbar)
+  fonts/            Schriften, lokal gehostet (DSGVO-konform, keine Google-Verbindung)
+
+1. PLATZHALTER ERSETZEN
+   Alle Stellen in [ECKIGEN KLAMMERN] in den drei .html-Dateien durch Ihre
+   Angaben ersetzen, z. B. mit einem Texteditor (Suchen & Ersetzen):
+   [TELEFON]  -> im Link "tel:" ohne Leerzeichen schreiben, z. B. tel:+4969123456
+   [E-MAIL], [NAME], [ANSPRECHPARTNER], [REGION / BUNDESWEIT],
+   [STRASSE HAUSNR.], [PLZ ORT], [X], [VERSICHERUNG ...], [IHR HINTERGRUND ...]
+
+2. KONTAKTFORMULAR EINRICHTEN (Formspree, kostenloser Einstieg)
+   a) Auf formspree.io ein Konto anlegen und ein neues Formular erstellen.
+   b) Sie erhalten eine ID, z. B. "xyzabcde".
+   c) In index.html [FORMSPREE-ID] durch diese ID ersetzen.
+   d) Einmal selbst eine Testanfrage senden und die Bestätigungs-Mail von
+      Formspree bestätigen. Danach landen alle Anfragen in Ihrem Postfach.
+   Alternativ: Viele Webhoster bieten ein eigenes Formular-Skript an.
+
+3. HOCHLADEN
+   Den gesamten Ordnerinhalt (inkl. fonts/) in das Hauptverzeichnis Ihres
+   Webspaces laden (per FTP oder über den Dateimanager des Hosters,
+   z. B. IONOS, Strato, all-inkl). Oder kostenlos: Ordner auf
+   app.netlify.com/drop ziehen und danach eigene Domain verbinden.
+
+4. VOR DEM LIVEGANG PRÜFEN
+   - Impressum und Datenschutzerklärung vollständig?
+   - SSL (https) beim Hoster aktiviert?
+   - Formular getestet?
+   - Seite auf dem Handy angesehen?
