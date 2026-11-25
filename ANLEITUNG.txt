@@ -1,0 +1,103 @@
+DYAS – Webseite online stellen
+================================
+
+INHALT DES ORDNERS
+  index.html        Startseite
+  impressum.html    Impressum (Vorlage – bitte ausfüllen)
+  datenschutz.html  Datenschutzerklärung (Vorlage – Text per Generator erstellen)
+  style.css         Gestaltung (Farben ganz oben unter :root änderbar)
+  fonts/            Schriften, lokal gehostet (DSGVO-konform, keine Google-Verbindung)
+
+1. PLATZHALTER ERSETZEN
+   Alle Stellen in [ECKIGEN KLAMMERN] in den drei .html-Dateien durch Ihre
+   Angaben ersetzen, z. B. mit einem Texteditor (Suchen & Ersetzen):
+   [TELEFON]  -> im Link "tel:" ohne Leerzeichen schreiben, z. B. tel:+4969123456
+   [E-MAIL], [NAME], [ANSPRECHPARTNER], [REGION / BUNDESWEIT],
+   [STRASSE HAUSNR.], [PLZ ORT], [X], [VERSICHERUNG ...], [IHR HINTERGRUND ...]
+
+2. KONTAKTFORMULAR EINRICHTEN (Formspree, kostenloser Einstieg)
+   a) Auf formspree.io ein Konto anlegen und ein neues Formular erstellen.
+   b) Sie erhalten eine ID, z. B. "xyzabcde".
+   c) In index.html [FORMSPREE-ID] durch diese ID ersetzen.
+   d) Einmal selbst eine Testanfrage senden und die Bestätigungs-Mail von
+      Formspree bestätigen. Danach landen alle Anfragen in Ihrem Postfach.
+   Alternativ: Viele Webhoster bieten ein eigenes Formular-Skript an.
+
+3. HOCHLADEN
+   Den gesamten Ordnerinhalt (inkl. fonts/) in das Hauptverzeichnis Ihres
+   Webspaces laden (per FTP oder über den Dateimanager des Hosters,
+   z. B. IONOS, Strato, all-inkl). Oder kostenlos: Ordner auf
+   app.netlify.com/drop ziehen und danach eigene Domain verbinden.
+
+4. VOR DEM LIVEGANG PRÜFEN
+   - Impressum und Datenschutzerklärung vollständig?
+   - SSL (https) beim Hoster aktiviert?
+   - Formular getestet?
+   - Seite auf dem Handy angesehen?
+
+5. LOKAL STARTEN UND PLAYWRIGHT-TESTS AUSFÜHREN
+   Voraussetzungen: Node.js ab Version 22, npm und Python 3 (python3).
+   Im IntelliJ-Terminal im Projektordner:
+
+     npm ci
+     npx playwright install chromium firefox webkit
+     npm run e2e
+
+   Der Testlauf startet und beendet seinen eigenen Webserver auf Port 4173.
+   Ein bereits laufender Vorschau-Server auf Port 8000 bleibt unberührt.
+   Ein Build ist für diese statische Webseite nicht erforderlich.
+
+   Weitere Befehle:
+     npm start                         Vorschau auf http://127.0.0.1:8000
+     npm run e2e:ui                    Interaktive Playwright-Oberfläche
+     npm run e2e:headed                Tests mit sichtbaren Browsern
+     npm run e2e -- --project=chromium  Nur Chromium
+     npm run e2e -- --repeat-each=3     Drei Stabilitätsdurchläufe
+     npm run e2e:report                Letzten HTML-Bericht öffnen
+     npm run typecheck                 TypeScript prüfen
+
+   Nicht gleichzeitig mehrere Testläufe starten: Port 4173 ist reserviert.
+   Vor npm start einen eventuell noch laufenden Port-8000-Server beenden.
+   Die Tests prüfen Startseite, lokale Ressourcen, Navigation, Rechtliches,
+   Pflichtfelder, E-Mail-Validierung, gemockten Formularversand und Layout.
+   Browser: Chromium, Firefox, WebKit (Safari-Engine) und mobiles Chromium.
+   Mobile Tests emulieren ein Pixel 7; sie ersetzen keinen echten Gerätetest.
+   Formspree ist standardmäßig gesperrt. Der Versandtest beantwortet die
+   Anfrage lokal mit einem Mock; es werden keine echten Anfragen versendet.
+   Ein grüner Test bestätigt NICHT die echte Formspree-Konfiguration.
+
+6. GITHUB ACTIONS UND NIGHTLIES
+   Repository: https://github.com/otmanefakhri/dyas-webseite
+   Workflow: .github/workflows/playwright.yml
+   Nach Übernahme der Dateien nach main:
+     - Pushes nach main und Pull Requests gegen main führen die Tests aus.
+     - Unter Actions > Playwright E2E > Run workflow ist ein manueller Lauf
+       möglich.
+     - Nightly: täglich 02:00 Uhr Europe/Berlin, mit lokaler Zeitzone statt
+       festem UTC-Versatz (Sommer-/Winterzeit).
+     - GitHub führt Zeitpläne auf dem Default-Branch aus. Dieser muss main
+       sein und den Workflow enthalten. Geplante Läufe können sich verzögern.
+       Bei inaktiven öffentlichen Repositories kann GitHub Zeitpläne nach
+       60 Tagen deaktivieren; dann unter Actions wieder aktivieren.
+     - Instabile Tests lassen den CI-Lauf trotz erfolgreichem Retry scheitern.
+
+   Ergebnisse: Actions > Playwright E2E > Lauf auswählen.
+   Die Zusammenfassung verlinkt das 14 Tage gespeicherte Berichtsartefakt:
+     playwright-report/       HTML-Bericht
+     test-results/junit.xml   JUnit-Ergebnis
+     test-results/results.json Strukturierte Ergebnisse
+     test-results/artifacts/  Screenshots, Videos und Traces bei Fehlern
+
+   ZIP herunterladen, entpacken und den enthaltenen HTML-Bericht starten:
+     npx playwright show-report /pfad/zum/entpackten/playwright-report
+
+   npm-Abhängigkeiten, generierte Berichte und IDE-Dateien sind in
+   .gitignore ausgeschlossen. package-lock.json gehört ins Repository.
+   Für CI werden keine eigenen GitHub-Tokens oder Formspree-Secrets benötigt.
+
+7. TEAMS (ZURÜCKGESTELLT)
+   Aktuell werden Ergebnisse nur in GitHub veröffentlicht.
+   Eine Teams-Benachrichtigung ist noch nicht implementiert.
+   Später kann ein Teams-Workflow-Webhook als GitHub-Actions-Secret
+   hinterlegt werden. Eine Webhook-URL niemals in Dateien eintragen,
+   committen oder im Chat teilen.

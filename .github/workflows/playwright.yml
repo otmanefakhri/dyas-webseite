@@ -1,0 +1,85 @@
+name: Playwright E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
+      timezone: Europe/Berlin
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playwright-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+
+jobs:
+  e2e:
+    name: Chromium, Firefox, WebKit und Mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: 'true'
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v6
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Python für den lokalen Testserver einrichten
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Playwright-Browser installieren
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: TypeScript prüfen
+        run: npm run typecheck
+
+      - name: E2E-Tests ausführen
+        id: tests
+        run: npm run e2e
+
+      - name: Berichte und Fehlerartefakte sichern
+        id: report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Ergebnis im Workflow anzeigen
+        if: ${{ !cancelled() }}
+        env:
+          TEST_OUTCOME: ${{ steps.tests.outcome }}
+          REPORT_URL: ${{ steps.report.outputs.artifact-url }}
+        run: |
+          {
+            echo '## Playwright E2E'
+            printf 'Testergebnis: **%s**\n\n' "$TEST_OUTCOME"
+            echo 'Browser: Chromium, Firefox, WebKit und mobiles Chromium.'
+            echo
+            if [ -n "$REPORT_URL" ]; then
+              printf '[HTML-, JUnit- und JSON-Berichte herunterladen](%s)\n' "$REPORT_URL"
+              echo
+              echo 'Bei Fehlern enthalten die Artefakte auch Screenshots, Videos und Traces.'
+            else
+              echo 'Kein Bericht vorhanden. Bitte die vorherigen Schritte prüfen.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
